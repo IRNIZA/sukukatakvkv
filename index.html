@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>DidikARealiti AI — Membaca KVKV (Tahun 1)</title>
+  
+  <!-- Pustaka Wajib AR Kad & AI Adaptif (Mengikut Urutan Ditetapkan) -->
+  <script src="https://nazatulainiabdmajid.github.io/DidikARealiti_AI/ar-kad.js"></script>
+  <script src="https://nazatulainiabdmajid.github.io/DidikARealiti_AI/ai-adaptif.js"></script>
+
+  <style>
+    :root {
+      --bg-app: #f4f7fb;
+      --surface: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      
+      /* Warna 4 Fasa Kolb */
+      --fasa1-color: #2563eb; /* Alami - Biru */
+      --fasa1-bg: #eff6ff;
+      --fasa2-color: #7c3aed; /* Renung - Ungu */
+      --fasa2-bg: #f5f3ff;
+      --fasa3-color: #059669; /* Faham - Hijau */
+      --fasa3-bg: #ecfdf5;
+      --fasa4-color: #d97706; /* Cuba - Jingga */
+      --fasa4-bg: #fffbeb;
+
+      /* Warna Label Sokongan Dialog (Oinas-Kukkonen & Harjumaa) */
+      --lbl-pencetus: #0284c7;
+      --lbl-peringatan: #d97706;
+      --lbl-cadangan: #7c3aed;
+      --lbl-pujian: #16a34a;
+      --lbl-ganjaran: #db2777;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-app);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding-bottom: 40px;
+    }
+
+    /* Bar Atas */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .header-top {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-title h1 {
+      font-size: 1.15rem;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .app-title span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .stats-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stat-badge {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-reset {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-reset.confirm-state {
+      background: #dc2626;
+      color: #ffffff;
+      border-color: #b91c1c;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+
+    /* Navigasi 4 Fasa Kolb */
+    .nav-fasa {
+      max-width: 900px;
+      margin: 12px auto 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .tab-btn {
+      padding: 10px 6px;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      background: #f1f5f9;
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .tab-btn[data-fasa="1"].active { background: var(--fasa1-bg); color: var(--fasa1-color); border-color: var(--fasa1-color); }
+    .tab-btn[data-fasa="2"].active { background: var(--fasa2-bg); color: var(--fasa2-color); border-color: var(--fasa2-color); }
+    .tab-btn[data-fasa="3"].active { background: var(--fasa3-bg); color: var(--fasa3-color); border-color: var(--fasa3-color); }
+    .tab-btn[data-fasa="4"].active { background: var(--fasa4-bg); color: var(--fasa4-color); border-color: var(--fasa4-color); }
+
+    /* Kontena Utama */
+    main {
+      max-width: 900px;
+      margin: 16px auto;
+      padding: 0 16px;
+    }
+
+    /* Watak Pemandu & Sokongan Dialog */
+    .guide-box {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      border: 2px solid #e2e8f0;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .guide-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .guide-content {
+      flex: 1;
+    }
+
+    .guide-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+
+    .guide-name {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #0f172a;
+    }
+
+    .dialog-badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      color: #fff;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .badge-PENCETUS { background-color: var(--lbl-pencetus); }
+    .badge-PERINGATAN { background-color: var(--lbl-peringatan); }
+    .badge-CADANGAN { background-color: var(--lbl-cadangan); }
+    .badge-PUJIAN { background-color: var(--lbl-pujian); }
+    .badge-GANJARAN { background-color: var(--lbl-ganjaran); }
+
+    .guide-text {
+      font-size: 0.95rem;
+      color: #334155;
+    }
+
+    /* Seksyen Fasa */
+    .fasa-panel {
+      display: none;
+      background: var(--surface);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+      border-top: 6px solid #ccc;
+    }
+
+    .fasa-panel.active { display: block; }
+    #fasa-1 { border-top-color: var(--fasa1-color); }
+    #fasa-2 { border-top-color: var(--fasa2-color); }
+    #fasa-3 { border-top-color: var(--fasa3-color); }
+    #fasa-4 { border-top-color: var(--fasa4-color); }
+
+    .fasa-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .fasa-desc {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      margin-bottom: 16px;
+    }
+
+    /* Butang Tindakan Utama */
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .btn {
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--fasa1-color); color: #fff; }
+    .btn-secondary { background: #e2e8f0; color: #1e293b; }
+    .btn-success { background: var(--fasa3-color); color: #fff; }
+    .btn-warning { background: var(--fasa4-color); color: #fff; }
+    .btn-purple { background: var(--fasa2-color); color: #fff; }
+
+    /* Misi Alami & Grid Kad */
+    .mission-banner {
+      background: var(--fasa1-bg);
+      border: 1px dashed var(--fasa1-color);
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      font-weight: 700;
+      color: #1e40af;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .word-card {
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+      background: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .word-card:hover { border-color: var(--fasa1-color); transform: translateY(-2px); }
+    .word-card.found {
+      border-color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    .word-card .check-mark {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #16a34a;
+      color: #fff;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .word-card.found .check-mark { display: flex; }
+
+    .card-art {
+      height: 75px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 6px;
+    }
+
+    .card-ar-thumb {
+      width: 44px;
+      height: 44px;
+      margin: 4px auto;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .card-ar-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .word-syllables {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .syl-1 { color: #dc2626; }
+    .syl-2 { color: #2563eb; }
+
+    .word-info {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Kawasan Cetak Kad Guru */
+    details.print-section {
+      margin-top: 20px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: #f8fafc;
+    }
+
+    details.print-section summary {
+      font-weight: 700;
+      cursor: pointer;
+      color: #334155;
+    }
+
+    #arkad-print-container {
+      margin-top: 12px;
+    }
+
+    /* Fasa 2: Renung (Suara & Teks) */
+    .reflect-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      background: #faf5ff;
+    }
+
+    .reflect-q {
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #4c1d95;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    textarea.reflect-input, input.text-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 0.95rem;
+    }
+
+    .feedback-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .feedback-box.show { display: block; }
+    .feedback-ok { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    .feedback-warn { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+
+    /* Fasa 3: Faham (Kuiz AI Adaptif + Semakan Sebutan) */
+    .pronounce-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 18px;
+    }
+
+    .ai-status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin-bottom: 14px;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    /* Fasa 4: Cuba (Bina Perkataan KVKV) */
+    .cuba-challenge-box {
+      background: var(--fasa4-bg);
+      border: 2px solid #fcd34d;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .syllable-builder {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .syl-chip {
+      padding: 10px 16px;
+      background: #fff;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .syl-chip:hover { border-color: var(--fasa4-color); background: #fffbeb; }
+
+    .word-slot-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .slot-box {
+      min-width: 70px;
+      height: 54px;
+      border: 2px dashed #d97706;
+      border-radius: 12px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #b45309;
+    }
+
+    /* Lencana Modal / Senarai */
+    .badges-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .badge-item {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: #f1f5f9;
+      color: #94a3b8;
+      border: 1px solid #e2e8f0;
+    }
+
+    .badge-item.unlocked {
+      background: #fef3c7;
+      color: #b45309;
+      border-color: #f59e0b;
+    }
+
+    /* Footer */
+    footer {
+      max-width: 900px;
+      margin: 28px auto 0;
+      padding: 16px;
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 600px) {
+      .nav-fasa { grid-template-columns: repeat(2, 1fr); }
+      .cards-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BAR ATAS -->
+  <header>
+    <div class="header-top">
+      <div class="app-title">
+        <h1>📖 Kembara Suku Kata KVKV</h1>
+        <span>Bahasa Melayu Tahun 1 • Pemulihan Konstruk 2</span>
+      </div>
+      <div class="stats-bar">
+        <div class="stat-badge" title="Bintang Terkumpul">★ <span id="star-count">0</span></div>
+        <div class="stat-badge" title="Lencana Terkumpul">🏅 <span id="badge-count">0</span>/4</div>
+        <button id="btn-reset-all" class="btn-reset" onclick="kendaliMulaSemula()">🔄 Mula semula</button>
+      </div>
+    </div>
+
+    <!-- NAVIGASI 4 FASA KOLB -->
+    <nav class="nav-fasa" aria-label="Fasa Pembelajaran Kolb">
+      <button class="tab-btn active" data-fasa="1" onclick="tukarFasa(1)">1. Alami</button>
+      <button class="tab-btn" data-fasa="2" onclick="tukarFasa(2)">2. Renung</button>
+      <button class="tab-btn" data-fasa="3" onclick="tukarFasa(3)">3. Faham</button>
+      <button class="tab-btn" data-fasa="4" onclick="tukarFasa(4)">4. Cuba</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- WATAK PEMANDU & SOKONGAN DIALOG -->
+    <section class="guide-box" aria-live="polite">
+      <div class="guide-avatar" id="guide-avatar">🦉</div>
+      <div class="guide-content">
+        <div class="guide-header">
+          <span class="guide-name">Cikgu Bijak (Burung Hantu)</span>
+          <span class="dialog-badge badge-PENCETUS" id="dialog-label">PENCETUS</span>
+        </div>
+        <p class="guide-text" id="dialog-text">Selamat datang! Mari teroka perkataan KVKV bersama Cikgu Bijak.</p>
+        <div class="badges-strip" id="badges-list"></div>
+      </div>
+    </section>
+
+    <!-- FASA 1: ALAMI -->
+    <section id="fasa-1" class="fasa-panel active">
+      <h2 class="fasa-title" style="color: var(--fasa1-color);">Fasa 1: Alami — Teroka Kad Perkataan KVKV</h2>
+      <p class="fasa-desc">Imbas kad bercetak menggunakan kamera AR atau klik gambar kad di bawah untuk mendengar sebutan dan melihat pecahan suku kata KVKV.</p>
+
+      <!-- Dua Butang Mula Wajib -->
+      <div class="action-row">
+        <button class="btn btn-secondary" onclick="aktifkanModKlik()">✋ Tanpa kamera: klik gambar kad</button>
+        <button class="btn btn-primary" onclick="mulaKameraAR()">📷 Dengan kamera: imbas kad (AR)</button>
+      </div>
+
+      <!-- Paparan Misi Semasa -->
+      <div class="mission-banner" id="mission-status">
+        Misi Semasa: Cari dan kenali semua 8 kad perkataan KVKV (0/8 selesai).
+      </div>
+
+      <!-- Grid Kad Interaktif -->
+      <div class="cards-grid" id="cards-grid"></div>
+
+      <!-- Bahagian Kad Untuk Dicetak (Guru) -->
+      <details class="print-section">
+        <summary>🖨️ Kad untuk dicetak (guru) — Klik untuk buka penjana kad AR</summary>
+        <p style="font-size:0.85rem; color:#475569; margin-top:8px;">
+          Cetak kad penanda ini dan imbas menggunakan butang kamera di atas.
+        </p>
+        <div id="arkad-print-container"></div>
+      </details>
+    </section>
+
+    <!-- FASA 2: RENUNG -->
+    <section id="fasa-2" class="fasa-panel">
+      <h2 class="fasa-title" style="color: var(--fasa2-color);">Fasa 2: Renung — Fikir & Ceritakan Pola KVKV</h2>
+      <p class="fasa-desc">Jawab soalan refleksi di bawah menggunakan suara (mikrofon) atau taip jawapan anda untuk mengesan pola huruf konsonan dan vokal.</p>
+      <div id="renung-container"></div>
+    </section>
+
+    <!-- FASA 3: FAHAM -->
+    <section id="fasa-3" class="fasa-panel">
+      <h2 class="fasa-title" style="color: var(--fasa3-color);">Fasa 3: Faham — Kuiz Adaptif & Latihan Sebutan</h2>
+      <p class="fasa-desc">Uji kefahaman menggabung suku kata awal dan akhir KVKV melalui kuiz pintar AI Adaptif serta semakan sebutan lisan.</p>
+
+      <!-- Aktiviti Tambahan Semakan Sebutan Sasaran -->
+      <div class="pronounce-box">
+        <div style="font-weight: 800; color: #166534; margin-bottom: 6px;">🎙️ Semakan Sebutan Perkataan Sasaran: <strong id="target-pronounce-word" style="font-size:1.2rem; text-transform:uppercase;">BAJU</strong></div>
+        <p style="font-size:0.85rem; color:#15803d; margin-bottom:10px;">Sebut perkataan di atas dengan jelas atau taip sebutannya untuk disemak.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+          <button class="btn btn-success" onclick="mulaSuaraSebutan()">🎤 Sebut Perkataan</button>
+          <button class="btn btn-secondary" onclick="tukarPerkataanSebutan()">🔀 Tukar Perkataan</button>
+          <input type="text" id="input-sebutan-manual" class="text-input" style="max-width:180px;" placeholder="Atau taip perkataan..." />
+          <button class="btn btn-primary" onclick="semakSebutanManual()">Semak</button>
+        </div>
+        <div id="feedback-sebutan" class="feedback-box"></div>
+      </div>
+
+      <!-- Panel Status AI Adaptif -->
+      <div class="ai-status-bar">
+        <span>🧠 Tahap AI Adaptif Semasa: <strong id="ai-level-display">Mudah (Aras 1)</strong></span>
+        <button class="btn btn-secondary" style="padding:6px 10px; font-size:0.8rem;" onclick="muatKuizAdaptif()">🔄 Set Kuiz Baharu</button>
+      </div>
+
+      <!-- Bekas Kosong untuk AIAdaptif.kuiz -->
+      <div id="kuiz-adaptif-container"></div>
+    </section>
+
+    <!-- FASA 4: CUBA -->
+    <section id="fasa-4" class="fasa-panel">
+      <h2 class="fasa-title" style="color: var(--fasa4-color);">Fasa 4: Cuba — Bengkel Bina Perkataan KVKV</h2>
+      <p class="fasa-desc">Gunakan kemahiran membaca anda untuk mencantumkan dua suku kata terbuka (KV + KV) menjadi perkataan bermakna berdasarkan gambar.</p>
+
+      <div class="cuba-challenge-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <span style="font-weight:800; color:#92400e;" id="cuba-level-label">Cabaran Aras 1 (Mudah)</span>
+          <button class="btn btn-secondary" style="padding:6px 12px; font-size:0.82rem;" onclick="janaCabaranCuba()">🎲 Cabaran Seterusnya</button>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:16px; margin-top:14px; flex-wrap:wrap;">
+          <div id="cuba-picture" style="width:90px; height:90px; background:#fff; border-radius:14px; border:2px solid #f59e0b; display:flex; align-items:center; justify-content:center;"></div>
+          <div>
+            <div style="font-weight:700; font-size:1.05rem; color:#78350f;" id="cuba-prompt">Bina perkataan bagi gambar ini:</div>
+            <div style="font-size:0.88rem; color:#92400e;" id="cuba-clue">Petunjuk: Gabungkan 2 suku kata KV + KV.</div>
+          </div>
+        </div>
+
+        <!-- Slot Cantuman Suku Kata -->
+        <div class="word-slot-display">
+          <div class="slot-box" id="slot-1">?</div>
+          <span style="font-weight:900; font-size:1.4rem; color:#d97706;">+</span>
+          <div class="slot-box" id="slot-2">?</div>
+          <span style="font-weight:900; font-size:1.4rem; color:#d97706;">=</span>
+          <div class="slot-box" id="slot-result" style="min-width:110px; background:#fef3c7;">...</div>
+        </div>
+
+        <!-- Pilihan Suku Kata -->
+        <div style="font-size:0.85rem; font-weight:700; color:#78350f;">Klik dua suku kata di bawah mengikut urutan:</div>
+        <div class="syllable-builder" id="syllable-choices"></div>
+
+        <div class="action-row" style="margin-top:12px; margin-bottom:0;">
+          <button class="btn btn-warning" onclick="semakJawapanCuba()">✅ Semak Perkataan</button>
+          <button class="btn btn-secondary" onclick="kosongkanSlotCuba()">🧹 Padam Pilihan</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER KREDIT WAJIB -->
+  <footer>
+    <p>Berdasarkan template DidikARealiti AI © 2026 FTSM, Universiti Kebangsaan Malaysia (CC BY-NC-SA 4.0)</p>
+    <p>Diadaptasi oleh Cikgu Bahasa Melayu Tahun 1, SK Putrajaya</p>
+  </footer>
+
+  <script>
+    /*************************************************************************
+     * 1. DATA UTAMA KANDUNGAN (BERDASARKAN JADUAL PERANCANGAN / BUKU KERJA)
+     *    Konstruk 2: Membaca Suku Kata Terbuka KVKV (Tahun 1)
+     *************************************************************************/
+    const WORDS = [
+      {
+        id: 0,
+        nama: "baju",
+        suku1: "ba",
+        suku2: "ju",
+        info: "ba + ju = baju (Pakaian yang dipakai pada badan)",
+        svg: `<svg viewBox="0 0 80 80" width="64" height="64"><path d="M25 15 L10 28 L18 36 L25 30 L25 65 L55 65 L55 30 L62 36 L70 28 L55 15 L47 20 Q40 25 33 20 Z" fill="#60a5fa" stroke="#1e3a8a" stroke-width="2.5"/></svg>`
+      },
+      {
+        id: 1,
+        nama: "buku",
+        suku1: "bu",
+        suku2: "ku",
+        info: "bu + ku = buku (Bahan bacaan berhelaian kertas)",
+        svg: `<svg viewBox="0 0 80 80" width="64" height="64"><rect x="18" y="14" width="44" height="52" rx="4" fill="#f87171" stroke="#7f1d1d" stroke-width="2.5"/><rect x="24" y="14" width="38" height="52" rx="2" fill="#fef2f2" stroke="#7f1d1d" stroke-width="2"/><line x1="30" y1="26" x2="54" y2="26" stroke="#991b1b" stroke-width="2"/><line x1="30" y1="36" x2="54" y2="36" stroke="#991b1b" stroke-width="2"/></svg>`
+      },
+      {
+        id: 2,
+        nama: "roti",
+        suku1: "ro",
+        suku2: "ti",
+        info: "ro + ti = roti (Makanan daripada tepung yang dibakar)",
+        svg: `<svg viewBox="0 0 80 80" width="64" height="64"><path d="M18 34 C12 22, 26 14, 40 14 C54 14, 68 22, 62 34 L60 62 L20 62 Z" fill="#fcd34d" stroke="#92400e" stroke-width="2.5"/><path d="M22 34 L58 34 L56 58 L24 58 Z" fill="#fef3c7"/></svg>`
+      },
+      {
+        id: 3,
+        nama: "mata",
+        suku1: "ma",
+        suku2: "ta",
+        info: "ma + ta = mata (Deria untuk melihat)",
+        svg: `<svg viewBox="0 0 80 80" width="64" height="64"><path d="M10 40 Q40 16 70 40 Q40 64 10 40 Z" fill="#ffffff" stroke="#1e293b" stroke-width="2.5"/><circle cx="40" cy="40" r="11" fill="#3b82f6"/><circle cx="40" cy="40" r="5" fill="#0f172a"/></svg>`
+      },
+      {
+        id: 4,
+        nama: "kaki",
+        suku1: "ka",
+        suku2: "ki",
+        info: "ka + ki = kaki (Anggota badan untuk berjalan)",
+        svg: `<svg viewBox="0 0 80 80" width="64" height="64"><path d="M30 14 L30 48 Q30 56 20 58 L16 64 L54 64 Q60 64 58 56 L45 50 L45 14 Z" fill="#fed7aa" stroke="#9a3412" stroke-width="2.5"/></svg>`
+      },
+      {
+        id: 5,
+        nama: "gigi",
+        suku1: "gi",
+        suku2: "gi",
+        info: "gi + gi = gigi (Struktur putih di dalam mulut untuk mengunyah)",
+        svg: `<svg viewBox="0 0 80 80" width="64" height="64"><path d="M22 20 Q40 14 58 20 Q62 40 54 62 Q48 64 44 48 Q40 44 36 48 Q32 64 26 62 Q18 40 22 20 Z" fill="#ffffff" stroke="#475569" stroke-width="2.5"/></svg>`
+      },
+      {
+        id: 6,
+        nama: "ceri",
+        suku1: "ce",
+        suku2: "ri",
+        info: "ce + ri = ceri (Buah kecil berwarna merah bertangkai)",
+        svg: `<svg viewBox="0 0 80 80" width="64" height="64"><path d="M42 16 Q32 34 26 48 M42 16 Q48 34 54 48" fill="none" stroke="#15803d" stroke-width="2.5"/><path d="M42 16 Q56 12 60 22 Q48 24 42 16 Z" fill="#22c55e" stroke="#15803d" stroke-width="2"/><circle cx="26" cy="54" r="11" fill="#ef4444" stroke="#991b1b" stroke-width="2"/><circle cx="54" cy="54" r="11" fill="#ef4444" stroke="#991b1b" stroke-width="2"/></svg>`
+      },
+      {
+        id: 7,
+        nama: "kuda",
+        suku1: "ku",
+        suku2: "da",
+        info: "ku + da = kuda (Haiwan berkaki empat yang pantas berlari)",
+        svg: `<svg viewBox="0 0 80 80" width="64" height="64"><path d="M24 58 L24 40 L48 40 L54 22 L62 26 L56 44 L56 58 M30 40 L30 58 M50 44 L50 58" fill="none" stroke="#78350f" stroke-width="4" stroke-linecap="round"/><circle cx="57" cy="24" r="5" fill="#92400e"/></svg>`
+      }
+    ];
+
+    // Soalan Fasa 2: Renung (Dengan kata kunci semakan)
+    const SOALAN_RENUNG = [
+      {
+        id: "r1",
+        soalan: "1. Perhatikan perkataan 'ba-ju' dan 'bu-ku'. Berapakah bilangan suku kata dalam setiap perkataan itu?",
+        kataKunci: ["dua", "2"],
+        petunjuk: "Kira bahagian bunyi apabila kamu menyebut ba (1) dan ju (2)."
+      },
+      {
+        id: "r2",
+        soalan: "2. Dalam suku kata 'ba', 'ro', dan 'ki', huruf apakah yang berada di hadapan (Konsonan atau Vokal)?",
+        kataKunci: ["konsonan", "huruf konsonan"],
+        petunjuk: "Huruf b, r, dan k ialah huruf konsonan yang diikuti huruf vokal a, o, i."
+      },
+      {
+        id: "r3",
+        soalan: "3. Bagaimanakah cara mudah untuk membaca perkataan KVKV seperti 'ma-ta' dan 'ro-ti'?",
+        kataKunci: ["eja", "suku kata", "gabung", "bunyi", "cantum"],
+        petunjuk: "Sebut bunyi suku kata pertama dahulu, kemudian gabungkan dengan suku kata kedua."
+      }
+    ];
+
+    // Bank Soalan Fasa 3: AIAdaptif (Min 3 Mudah lvl 1, 3 Sederhana lvl 2, 3 Sukar lvl 3)
+    const BANK_SOALAN_KUIZ = [
+      // ARAS 1: MUDAH (Mengenal suku kata awal & akhir bergambar)
+      {
+        lvl: 1,
+        c: "Suku Kata Awal",
+        t: "Apakah suku kata awal bagi perkataan 'ba-ju'?",
+        o: ["ba", "bu", "bi", "bo"],
+        a: "ba",
+        h: "Lihat dua huruf pertama pada perkataan baju (b + a)."
+      },
+      {
+        lvl: 1,
+        c: "Suku Kata Akhir",
+        t: "Lengkapkan perkataan bagi bahan bacaan: bu + ___ = buku",
+        o: ["ku", "ka", "ki", "ko"],
+        a: "ku",
+        h: "Bunyi akhir bagi perkataan buku menggunakan huruf k dan u."
+      },
+      {
+        lvl: 1,
+        c: "Suku Kata Awal",
+        t: "Apakah suku kata awal bagi anggota badan untuk melihat (ma-ta)?",
+        o: ["ma", "na", "sa", "pa"],
+        a: "ma",
+        h: "Mula dengan huruf konsonan 'm' dan vokal 'a'."
+      },
+
+      // ARAS 2: SEDERHANA (Membezakan bunyi vokal e, i, o, u dalam KVKV)
+      {
+        lvl: 2,
+        c: "Suku Kata Akhir",
+        t: "Pilih suku kata akhir yang betul untuk melengkapkan: ro + ___ = roti",
+        o: ["ti", "te", "ta", "tu"],
+        a: "ti",
+        h: "Suku kata kedua berbunyi 'ti' (t + i)."
+      },
+      {
+        lvl: 2,
+        c: "Suku Kata Awal",
+        t: "Pilih suku kata awal yang betul bagi buah merah bertangkai: ___ + ri = ceri",
+        o: ["ce", "ci", "ca", "cu"],
+        a: "ce",
+        h: "Bunyi e-pepet/e-taling pada huruf 'c' + 'e'."
+      },
+      {
+        lvl: 2,
+        c: "Gabung KVKV",
+        t: "Gabungan suku kata 'ka' dan 'ki' membentuk perkataan apa?",
+        o: ["kaki", "kaku", "koko", "kuda"],
+        a: "kaki",
+        h: "Cantumkan bunyi 'ka' di depan dan 'ki' di belakang."
+      },
+
+      // ARAS 3: SUKAR (Analisis & Pembentukan Perkataan KVKV baharu)
+      {
+        lvl: 3,
+        c: "Gabung KVKV",
+        t: "Jika suku kata 'ku' digabungkan dengan 'da', apakah haiwan yang terbentuk?",
+        o: ["kuda", "kuku", "kura", "kuli"],
+        a: "kuda",
+        h: "Suku kata kedua ialah 'da' (d + a)."
+      },
+      {
+        lvl: 3,
+        c: "Suku Kata Akhir",
+        t: "Perkataan 'gigi' mempunyai dua suku kata yang sama. Apakah suku kata itu?",
+        o: ["gi", "ge", "ga", "gu"],
+        a: "gi",
+        h: "Kedua-dua suku kata menggunakan huruf 'g' dan vokal 'i'."
+      },
+      {
+        lvl: 3,
+        c: "Gabung KVKV",
+        t: "Manakah antara berikut BUKAN perkataan berpola KVKV?",
+        o: ["bola", "baju", "buku", "ikan"],
+        a: "ikan",
+        h: "Perhatikan perkataan yang bermula dengan huruf vokal 'i' (V-K-V-K)."
+      }
+    ];
+
+    // Aktiviti Pembetulan bagi setiap konsep
+    const PEMBETULAN_KONSEP = {
+      "Suku Kata Awal": {
+        t: "Ulang Kaji Suku Kata Awal (KV)",
+        d: "Suku kata awal ialah dua huruf pertama (Konsonan + Vokal). Contoh: 'ba' dalam baju, 'ma' dalam mata. Cuba sebutkan konsonan diikuti vokal dengan jelas."
+      },
+      "Suku Kata Akhir": {
+        t: "Ulang Kaji Suku Kata Akhir (KV)",
+        d: "Suku kata akhir ialah bunyi kedua di hujung perkataan. Contoh: 'ti' dalam roti, 'ku' dalam buku. Perhatikan huruf vokal di hujung perkataan."
+      },
+      "Gabung KVKV": {
+        t: "Ulang Kaji Cantuman KV + KV",
+        d: "Baca suku kata pertama dahulu, berhenti sekejap, kemudian sambung suku kata kedua tanpa mengeja huruf satu per satu (Contoh: ka + ki -> kaki)."
+      }
+    };
+
+    // Lencana Ganjaran
+    const SENARAI_LENCANA = [
+      { id: "peneroka_ar", nama: "🔍 Peneroka Kad KVKV", syarat: "Temui semua 8 kad di Fasa Alami" },
+      { id: "pemikir_kvkv", nama: "💭 Pemikir Pola", syarat: "Jawab soalan refleksi di Fasa Renung" },
+      { id: "juara_kuiz", nama: "🧠 Juara Kuiz KVKV", syarat: "Selesaikan latihan di Fasa Faham" },
+      { id: "pembina_kata", nama: "🛠️ Pembina Perkataan", syarat: "Bina 3 perkataan betul di Fasa Cuba" }
+    ];
+
+    /*************************************************************************
+     * 2. KEADAAN APLIKASI & PENYIMPANAN (LOCALSTORAGE)
+     *************************************************************************/
+    const STORAGE_KEY = "didikarealiti_kvkv_t1_state";
+    let state = {
+      fasaSemasa: 1,
+      kadDijumpai: [],
+      bintang: 0,
+      lencana: [],
+      renungSelesai: {},
+      cubaBetul: 0
+    };
+
+    let idleTimer = null;
+    let resetConfirmTimer = null;
+    let resetPending = false;
+
+    function muatState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          state = { ...state, ...JSON.parse(saved) };
+        }
+      } catch (e) {
+        console.warn("Gagal memuatkan state:", e);
+      }
+    }
+
+    function simpanState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn("Gagal menyimpan state:", e);
+      }
+      kemasKiniHeader();
+    }
+
+    /*************************************************************************
+     * 3. SOKONGAN DIALOG (Oinas-Kukkonen & Harjumaa, 2009)
+     *    5 Elemen Wajib: PENCETUS, PERINGATAN, CADANGAN, PUJIAN, GANJARAN
+     *************************************************************************/
+    function paparMesejDialog(jenis, teks) {
+      const labelEl = document.getElementById("dialog-label");
+      const textEl = document.getElementById("dialog-text");
+      const jenisNormal = (jenis || "PENCETUS").toUpperCase();
+
+      // Petakan jenis daripada AIAdaptif jika perlu
+      let labelAkhir = "PENCETUS";
+      if (jenisNormal.includes("PUJI") || jenisNormal.includes("BETUL") || jenisNormal.includes("TAHNIAH")) {
+        labelAkhir = "PUJIAN";
+      } else if (jenisNormal.includes("CADANG") || jenisNormal.includes("PETUNJUK") || jenisNormal.includes("SALAH")) {
+        labelAkhir = "CADANGAN";
+      } else if (jenisNormal.includes("INGAT") || jenisNormal.includes("MASA")) {
+        labelAkhir = "PERINGATAN";
+      } else if (jenisNormal.includes("GANJAR") || jenisNormal.includes("BINTANG") || jenisNormal.includes("LENCANA")) {
+        labelAkhir = "GANJARAN";
+      } else if (["PENCETUS", "PERINGATAN", "CADANGAN", "PUJIAN", "GANJARAN"].includes(jenisNormal)) {
+        labelAkhir = jenisNormal;
+      }
+
+      labelEl.className = "dialog-badge badge-" + labelAkhir;
+      labelEl.textContent = labelAkhir;
+      textEl.textContent = teks;
+      resetPemasaPeringatan();
+    }
+
+    function resetPemasaPeringatan() {
+      if (idleTimer) clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        const pesananPeringatan = {
+          1: "Masa berlalu! Klik mana-mana gambar kad KVKV atau halakan kamera pada kad bercetak untuk meneruskan misi.",
+          2: "Jangan berhenti di sini! Cuba sebut atau taip jawapan refleksi pola KVKV anda.",
+          3: "Ayuh teruskan! Pilih jawapan pada kuiz adaptif atau cuba sebut perkataan sasaran di atas.",
+          4: "Mari bina perkataan! Klik dua suku kata KV di bawah untuk melengkapkan cabaran gambar."
+        };
+        paparMesejDialog("PERINGATAN", pesananPeringatan[state.fasaSemasa] || pesananPeringatan[1]);
+      }, 25000); // 25 saat tiada tindakan
+    }
+
+    function beriGanjaran(jumlahBintang, idLencana, sebab) {
+      let mesejGanjaran = "";
+      if (jumlahBintang > 0) {
+        state.bintang += jumlahBintang;
+        mesejGanjaran += `Anda menerima +${jumlahBintang} ★ (${sebab}). `;
+      }
+      if (idLencana && !state.lencana.includes(idLencana)) {
+        state.lencana.push(idLencana);
+        const infoLencana = SENARAI_LENCANA.find(l => l.id === idLencana);
+        mesejGanjaran += `Lencana baharu dibuka: ${infoLencana ? infoLencana.nama : idLencana}!`;
+      }
+      simpanState();
+      if (mesejGanjaran) {
+        paparMesejDialog("GANJARAN", mesejGanjaran);
+      }
+    }
+
+    function kemasKiniHeader() {
+      document.getElementById("star-count").textContent = state.bintang;
+      document.getElementById("badge-count").textContent = `${state.lencana.length}/${SENARAI_LENCANA.length}`;
+      
+      const badgesContainer = document.getElementById("badges-list");
+      badgesContainer.innerHTML = SENARAI_LENCANA.map(b => {
+        const unlocked = state.lencana.includes(b.id);
+        return `<span class="badge-item ${unlocked ? 'unlocked' : ''}" title="${b.syarat}">${unlocked ? '🏅' : '🔒'} ${b.nama}</span>`;
+      }).join("");
+    }
+
+    /*************************************************************************
+     * 4. NAVIGASI 4 FASA KOLB
+     *************************************************************************/
+    function tukarFasa(nomborFasa) {
+      state.fasaSemasa = nomborFasa;
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.toggle("active", Number(btn.dataset.fasa) === nomborFasa);
+      });
+      document.querySelectorAll(".fasa-panel").forEach(panel => {
+        panel.classList.toggle("active", panel.id === `fasa-${nomborFasa}`);
+      });
+
+      const pencetusFasa = {
+        1: "Fasa Alami bermula! Imbas kad AR atau klik gambar kad untuk meneroka 8 perkataan KVKV.",
+        2: "Fasa Renung bermula! Fikirkan tentang bunyi suku kata KV dan jawab 3 soalan refleksi.",
+        3: "Fasa Faham bermula! Uji kemahiran membaca KVKV melalui kuiz pintar AI Adaptif dan latihan sebutan.",
+        4: "Fasa Cuba bermula! Cantumkan dua suku kata terbuka untuk membentuk perkataan yang betul."
+      };
+      paparMesejDialog("PENCETUS", pencetusFasa[nomborFasa]);
+
+      if (nomborFasa === 3) {
+        kemasKiniPaparanTahapAI();
+      } else if (nomborFasa === 4) {
+        janaCabaranCuba();
+      }
+      simpanState();
+    }
+
+    /*************************************************************************
+     * 5. FASA 1: ALAMI & INTEGRASI PUSTAKA ArKad
+     *************************************************************************/
+    function teksMisiSemasa() {
+      const baki = WORDS.length - state.kadDijumpai.length;
+      if (baki <= 0) {
+        return "Tahniah! Semua 8 kad KVKV telah dijumpai!";
+      }
+      const kadSeterusnya = WORDS.find(w => !state.kadDijumpai.includes(w.id));
+      return `Misi Alami (${state.kadDijumpai.length}/${WORDS.length}): Cari kad "${kadSeterusnya ? kadSeterusnya.nama.toUpperCase() : ''}"`;
+    }
+
+    function apabilaKadDijumpa(index, kadObj) {
+      const item = WORDS[index];
+      if (!item) return;
+
+      // Sebut perkataan menggunakan sintesis suara pelayar jika disokong
+      sebutTeks(item.nama);
+
+      const kaliPertama = !state.kadDijumpai.includes(index);
+      if (kaliPertama) {
+        state.kadDijumpai.push(index);
+        simpanState();
+        paparMesejDialog("PUJIAN", `Hebat! Anda berjaya meneroka kad "${item.nama.toUpperCase()}" (${item.suku1} + ${item.suku2}).`);
+        
+        if (state.kadDijumpai.length === WORDS.length) {
+          setTimeout(() => {
+            beriGanjaran(3, "peneroka_ar", "Menjumpai kesemua 8 kad KVKV");
+          }, 1200);
+        } else {
+          setTimeout(() => {
+            beriGanjaran(1, null, `Meneroka kad ${item.nama}`);
+          }, 1200);
+        }
+      } else {
+        paparMesejDialog("PENCETUS", `Ini ialah kad "${item.nama.toUpperCase()}": ${item.info}`);
+      }
+
+      kemasKiniUIAlami();
+    }
+
+    function kemasKiniUIAlami() {
+      document.getElementById("mission-status").textContent = teksMisiSemasa();
+      const grid = document.getElementById("cards-grid");
+      let gambarPenanda = [];
+      if (window.ArKad && typeof ArKad.gambarKad === "function") {
+        gambarPenanda = ArKad.gambarKad() || [];
+      }
+
+      grid.innerHTML = WORDS.map((w, idx) => {
+        const sudah = state.kadDijumpai.includes(idx);
+        const penandaSrc = gambarPenanda[idx] || "";
+        return `
+          <div class="word-card ${sudah ? 'found' : ''}" onclick="apabilaKadDijumpa(${idx}, WORDS[${idx}])">
+            <span class="check-mark">✓</span>
+            <div class="card-art">${w.svg}</div>
+            <div class="word-syllables">
+              <span class="syl-1">${w.suku1}</span><span class="syl-2">${w.suku2}</span>
+            </div>
+            <div class="word-info">${w.suku1} + ${w.suku2}</div>
+            ${penandaSrc ? `<div class="card-ar-thumb" title="Penanda AR #${idx+1}"><img src="${penandaSrc}" alt="Penanda ${w.nama}" /></div>` : ''}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function aktifkanModKlik() {
+      paparMesejDialog("PENCETUS", "Mod tanpa kamera aktif! Klik mana-mana gambar kad KVKV di bawah untuk mendengar sebutan dan mengumpul bintang.");
+      kemasKiniUIAlami();
+    }
+
+    function mulaKameraAR() {
+      paparMesejDialog("PENCETUS", "Membuka kamera AR... Halakan kamera peranti pada kad bercetak KVKV.");
+      if (window.ArKad && typeof ArKad.mula === "function") {
+        ArKad.mula();
+      } else {
+        paparMesejDialog("CADANGAN", "Pustaka ArKad sedang dimuatkan atau kamera tidak tersedia. Anda boleh guna mod klik kad tanpa kamera.");
+      }
+    }
+
+    function sediakanArKad() {
+      if (window.ArKad) {
+        ArKad.sediakan({
+          kad: WORDS.map(w => ({
+            nama: `${w.suku1.toUpperCase()}-${w.suku2.toUpperCase()} (${w.nama.toUpperCase()})`,
+            info: w.info
+          })),
+          apabilaJumpa: (i, kad) => {
+            apabilaKadDijumpa(i, kad);
+          },
+          misi: () => teksMisiSemasa()
+        });
+
+        const printEl = document.getElementById("arkad-print-container");
+        if (printEl && typeof ArKad.paparKad === "function") {
+          ArKad.paparKad(printEl);
+        }
+      }
+      kemasKiniUIAlami();
+    }
+
+    /*************************************************************************
+     * 6. FASA 2: RENUNG (SUARA KE TEKS & SEMAKAN KATA KUNCI)
+     *************************************************************************/
+    function binaPaparanRenung() {
+      const container = document.getElementById("renung-container");
+      container.innerHTML = SOALAN_RENUNG.map((item, idx) => `
+        <div class="reflect-card">
+          <div class="reflect-q">${item.soalan}</div>
+          <div class="input-group">
+            <textarea id="input-${item.id}" class="reflect-input" rows="2" placeholder="Taip jawapan anda di sini atau tekan butang Mikrofon...">${state.renungSelesai[item.id] || ""}</textarea>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn btn-purple" onclick="rakamSuaraRenung('${item.id}', ${idx})">🎤 Jawab Guna Suara</button>
+              <button class="btn btn-primary" onclick="semakJawapanRenung('${item.id}', ${idx})">Semak</button>
+            </div>
+          </div>
+          <div id="fb-${item.id}" class="feedback-box ${state.renungSelesai[item.id] ? 'show feedback-ok' : ''}">
+            ${state.renungSelesai[item.id] ? '✅ Jawapan telah disemak dan diterima!' : ''}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function semakJawapanRenung(idSoalan, index) {
+      const item = SOALAN_RENUNG[index];
+      const teksInput = document.getElementById(`input-${idSoalan}`).value.trim();
+      const fbEl = document.getElementById(`fb-${idSoalan}`);
+
+      if (!teksInput) {
+        fbEl.className = "feedback-box show feedback-warn";
+        fbEl.textContent = "Sila taip atau sebut jawapan anda terlebih dahulu sebelum menyemak.";
+        paparMesejDialog("CADANGAN", "Ruangan jawapan masih kosong. Cuba tulis atau sebutkan idea anda.");
+        return;
+      }
+
+      const teksKecil = teksInput.toLowerCase();
+      const kataDijumpai = item.kataKunci.filter(kk => teksKecil.includes(kk.toLowerCase()));
+      const kataTertinggal = item.kataKunci.filter(kk => !teksKecil.includes(kk.toLowerCase()));
+
+      if (kataDijumpai.length > 0) {
+        fbEl.className = "feedback-box show feedback-ok";
+        fbEl.innerHTML = `<strong>✅ Syabas! Idea tepat dikesan:</strong> "${kataDijumpai.join(", ")}".<br>Jawapan anda menunjukkan kefahaman pola KVKV yang baik.`;
+        
+        const belumPernah = !state.renungSelesai[idSoalan];
+        state.renungSelesai[idSoalan] = teksInput;
+        simpanState();
+
+        paparMesejDialog("PUJIAN", `Bagus sekali! Idea utama "${kataDijumpai[0]}" dalam jawapan anda sangat tepat.`);
+        if (belumPernah) {
+          const jumlahSelesai = Object.keys(state.renungSelesai).length;
+          setTimeout(() => {
+            beriGanjaran(1, jumlahSelesai >= SOALAN_RENUNG.length ? "pemikir_kvkv" : null, "Refleksi pola KVKV tepat");
+          }, 1000);
+        }
+      } else {
+        fbEl.className = "feedback-box show feedback-warn";
+        fbEl.innerHTML = `<strong>💡 Hampir tepat!</strong> Jawapan anda: <em>"${teksInput}"</em>.<br>Idea utama yang masih tertinggal berkaitan dengan konsep: <strong>${item.kataKunci[0]}</strong>. Petunjuk: ${item.petunjuk}`;
+        paparMesejDialog("CADANGAN", `Cuba fikirkan semula: ${item.petunjuk}`);
+      }
+    }
+
+    function rakamSuaraRenung(idSoalan, index) {
+      mulakanPengecamanSuara((transkrip) => {
+        const inputEl = document.getElementById(`input-${idSoalan}`);
+        inputEl.value = transkrip;
+        semakJawapanRenung(idSoalan, index);
+      });
+    }
+
+    /*************************************************************************
+     * 7. FASA 3: FAHAM (AIAdaptif.kuiz & SEMAKAN SEBUTAN SASARAN)
+     *************************************************************************/
+    let indeksPerkataanSebutan = 0;
+
+    function tukarPerkataanSebutan() {
+      indeksPerkataanSebutan = (indeksPerkataanSebutan + 1) % WORDS.length;
+      const sasaran = WORDS[indeksPerkataanSebutan].nama.toUpperCase();
+      document.getElementById("target-pronounce-word").textContent = sasaran;
+      document.getElementById("input-sebutan-manual").value = "";
+      document.getElementById("feedback-sebutan").className = "feedback-box";
+      paparMesejDialog("PENCETUS", `Perkataan sasaran baharu ialah "${sasaran}". Cuba sebutkan dengan jelas!`);
+    }
+
+    function bandingSebutanPerkataan(teksDiterima) {
+      const sasaranObj = WORDS[indeksPerkataanSebutan];
+      const sasaran = sasaranObj.nama.toLowerCase();
+      const bersih = teksDiterima.toLowerCase().replace(/[^a-z\s]/g, "").trim();
+      const fbEl = document.getElementById("feedback-sebutan");
+
+      if (!bersih) {
+        fbEl.className = "feedback-box show feedback-warn";
+        fbEl.textContent = "Tiada perkataan dikesan. Sila cuba lagi.";
+        return;
+      }
+
+      if (bersih === sasaran || bersih.includes(sasaran)) {
+        fbEl.className = "feedback-box show feedback-ok";
+        fbEl.innerHTML = `✅ <strong>Sebutan Tepat!</strong> Anda menyebut <strong>"${bersih.toUpperCase()}"</strong> (Sasaran: <strong>${sasaran.toUpperCase()}</strong> — ${sasaranObj.suku1} + ${sasaranObj.suku2}).`;
+        paparMesejDialog("PUJIAN", `Sebutan "${sasaran.toUpperCase()}" sangat jelas dan tepat!`);
+        setTimeout(() => beriGanjaran(1, null, `Sebutan tepat: ${sasaran}`), 900);
+      } else {
+        fbEl.className = "feedback-box show feedback-warn";
+        fbEl.innerHTML = `⚠️ <strong>Belum Tepat.</strong> Dikesan: <em>"${bersih}"</em>, sedangkan perkataan sasaran ialah <strong>"${sasaran.toUpperCase()}"</strong>. Cuba cerakinkan bunyi: <strong>${sasaranObj.suku1}</strong> + <strong>${sasaranObj.suku2}</strong>.`;
+        paparMesejDialog("CADANGAN", `Sebutan dikesan "${bersih}". Cuba bunyikan suku kata "${sasaranObj.suku1}" diikuti "${sasaranObj.suku2}".`);
+      }
+    }
+
+    function mulaSuaraSebutan() {
+      mulakanPengecamanSuara((transkrip) => {
+        document.getElementById("input-sebutan-manual").value = transkrip;
+        bandingSebutanPerkataan(transkrip);
+      });
+    }
+
+    function semakSebutanManual() {
+      const teks = document.getElementById("input-sebutan-manual").value;
+      bandingSebutanPerkataan(teks);
+    }
+
+    function kemasKiniPaparanTahapAI() {
+      const el = document.getElementById("ai-level-display");
+      if (window.AIAdaptif && typeof AIAdaptif.tahap === "function") {
+        const info = AIAdaptif.tahap();
+        const namaAras = { 1: "Mudah (Aras 1)", 2: "Sederhana (Aras 2)", 3: "Sukar (Aras 3)" };
+        el.textContent = namaAras[info.lvl] || `Aras ${info.lvl}`;
+      }
+    }
+
+    function muatKuizAdaptif() {
+      const bekas = document.getElementById("kuiz-adaptif-container");
+      bekas.innerHTML = "";
+      if (window.AIAdaptif && typeof AIAdaptif.kuiz === "function") {
+        AIAdaptif.kuiz("#kuiz-adaptif-container", {
+          soalan: BANK_SOALAN_KUIZ,
+          pembetulan: PEMBETULAN_KONSEP,
+          jumlah: 8,
+          mesej: (jenis, teks) => {
+            paparMesejDialog(jenis, teks);
+            kemasKiniPaparanTahapAI();
+            if (jenis && (jenis.toLowerCase().includes("tamat") || jenis.toLowerCase().includes("puji"))) {
+              beriGanjaran(2, "juara_kuiz", "Menyelesaikan Kuiz Adaptif KVKV");
+            }
+          }
+        });
+        kemasKiniPaparanTahapAI();
+      } else {
+        bekas.innerHTML = "<p>Memuatkan enjin AIAdaptif...</p>";
+      }
+    }
+
+    /*************************************************************************
+     * 8. FASA 4: CUBA (BINA PERKATAAN KVKV BERPANDUKAN AIAdaptif.tahap().lvl)
+     *************************************************************************/
+    let cabaranSemasa = null;
+    let pilihanSukuKata = [];
+    let masaMulaCuba = Date.now();
+
+    function janaCabaranCuba() {
+      let aras = 1;
+      if (window.AIAdaptif && typeof AIAdaptif.tahap === "function") {
+        aras = AIAdaptif.tahap().lvl || 1;
+      }
+
+      const labelAras = {
+        1: "Cabaran Aras 1 (Mudah — Gambar & 4 Pilihan Suku Kata)",
+        2: "Cabaran Aras 2 (Sederhana — Gambar & 6 Pilihan Suku Kata)",
+        3: "Cabaran Aras 3 (Sukar — Teka Maksud & 8 Pilihan Suku Kata)"
+      };
+      document.getElementById("cuba-level-label").textContent = labelAras[aras] || labelAras[1];
+
+      // Pilih perkataan sasaran secara rawak
+      cabaranSemasa = WORDS[Math.floor(Math.random() * WORDS.length)];
+      pilihanSukuKata = [];
+      masaMulaCuba = Date.now();
+
+      const picEl = document.getElementById("cuba-picture");
+      const promptEl = document.getElementById("cuba-prompt");
+      const clueEl = document.getElementById("cuba-clue");
+
+      if (aras === 1) {
+        picEl.innerHTML = cabaranSemasa.svg;
+        promptEl.textContent = "Cantumkan dua suku kata bagi gambar ini:";
+        clueEl.textContent = `Petunjuk: Mula dengan suku kata "${cabaranSemasa.suku1}".`;
+      } else if (aras === 2) {
+        picEl.innerHTML = cabaranSemasa.svg;
+        promptEl.textContent = "Bina perkataan KVKV yang sepadan dengan gambar:";
+        clueEl.textContent = `Petunjuk: Gabungan dua suku kata terbuka (KV + KV).`;
+      } else {
+        picEl.innerHTML = `<span style="font-size:2.2rem;">❓</span>`;
+        promptEl.textContent = `Bina perkataan KVKV berdasarkan petunjuk maksud:`;
+        clueEl.textContent = `Maksud: ${cabaranSemasa.info.split("=")[1] || cabaranSemasa.info}`;
+      }
+
+      // Jana pilihan suku kata (betul + pengganggu)
+      const jumlahPilihan = aras === 1 ? 4 : (aras === 2 ? 6 : 8);
+      const kolamSukuKata = [cabaranSemasa.suku1, cabaranSemasa.suku2];
+      const semuaSukuKata = WORDS.flatMap(w => [w.suku1, w.suku2]);
+
+      while (kolamSukuKata.length < jumlahPilihan) {
+        const rawak = semuaSukuKata[Math.floor(Math.random() * semuaSukuKata.length)];
+        if (kolamSukuKata.filter(x => x === rawak).length < 2) {
+          kolamSukuKata.push(rawak);
+        }
+      }
+
+      // Kocok susunan
+      kolamSukuKata.sort(() => Math.random() - 0.5);
+
+      const choicesEl = document.getElementById("syllable-choices");
+      choicesEl.innerHTML = kolamSukuKata.map(sk => 
+        `<button class="syl-chip" onclick="pilihSukuKataCuba('${sk}')">${sk}</button>`
+      ).join("");
+
+      kemasKiniSlotCuba();
+    }
+
+    function pilihSukuKataCuba(sk) {
+      if (pilihanSukuKata.length < 2) {
+        pilihanSukuKata.push(sk);
+        sebutTeks(sk);
+        kemasKiniSlotCuba();
+      }
+    }
+
+    function kosongkanSlotCuba() {
+      pilihanSukuKata = [];
+      kemasKiniSlotCuba();
+    }
+
+    function kemasKiniSlotCuba() {
+      document.getElementById("slot-1").textContent = pilihanSukuKata[0] || "?";
+      document.getElementById("slot-2").textContent = pilihanSukuKata[1] || "?";
+      document.getElementById("slot-result").textContent = pilihanSukuKata.length === 2 
+        ? (pilihanSukuKata[0] + pilihanSukuKata[1]) 
+        : "...";
+    }
+
+    function semakJawapanCuba() {
+      if (pilihanSukuKata.length < 2) {
+        paparMesejDialog("CADANGAN", "Sila pilih dua suku kata (KV + KV) dahulu sebelum menyemak.");
+        return;
+      }
+
+      const gabungan = (pilihanSukuKata[0] + pilihanSukuKata[1]).toLowerCase();
+      const betul = gabungan === cabaranSemasa.nama.toLowerCase();
+      const tempohSaat = Math.max(1, Math.round((Date.now() - masaMulaCuba) / 1000));
+
+      // Rekod prestasi ke pustaka AIAdaptif
+      if (window.AIAdaptif && typeof AIAdaptif.rekod === "function") {
+        AIAdaptif.rekod({
+          ok: betul,
+          hints: 0,
+          secs: tempohSaat,
+          exp: betul ? 20 : 5,
+          concept: "Gabung KVKV"
+        });
+      }
+
+      if (betul) {
+        sebutTeks(cabaranSemasa.nama);
+        state.cubaBetul += 1;
+        simpanState();
+        paparMesejDialog("PUJIAN", `Syabas! Cantuman "${cabaranSemasa.suku1} + ${cabaranSemasa.suku2} = ${cabaranSemasa.nama.toUpperCase()}" adalah tepat!`);
+        
+        setTimeout(() => {
+          beriGanjaran(2, state.cubaBetul >= 3 ? "pembina_kata" : null, `Membina perkataan ${cabaranSemasa.nama.toUpperCase()}`);
+          janaCabaranCuba();
+        }, 1400);
+      } else {
+        paparMesejDialog("CADANGAN", `Cantuman "${gabungan}" belum sepadan. Cuba dengar bunyi suku kata pertama "${cabaranSemasa.suku1}" dan cari pasangannya.`);
+        kosongkanSlotCuba();
+      }
+    }
+
+    /*************************************************************************
+     * 9. UTILITI SUARA KE TEKS (WEB SPEECH API) & SINTESIS SUARA
+     *************************************************************************/
+    function mulakanPengecamanSuara(callbackTeks) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        paparMesejDialog("CADANGAN", "Pelayar ini tidak menyokong mikrofon suara-ke-teks. Sila taip jawapan anda dalam kotak yang disediakan.");
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = "ms-MY";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      paparMesejDialog("PENCETUS", "🎙️ Mikrofon aktif... Sila sebutkan jawapan anda sekarang.");
+
+      recognition.onresult = (event) => {
+        const transkrip = event.results[0][0].transcript;
+        callbackTeks(transkrip);
+      };
+
+      recognition.onerror = (event) => {
+        paparMesejDialog("CADANGAN", `Suara kurang jelas (${event.error}). Anda boleh mencuba mikrofon semula atau menaip jawapan.`);
+      };
+
+      recognition.start();
+    }
+
+    function sebutTeks(teks) {
+      if ("speechSynthesis" in window) {
+        try {
+          window.speechSynthesis.cancel();
+          const utter = new SpeechSynthesisUtterance(teks);
+          utter.lang = "ms-MY";
+          utter.rate = 0.9;
+          window.speechSynthesis.speak(utter);
+        } catch (e) {}
+      }
+    }
+
+    /*************************************************************************
+     * 10. BUTANG MULA SEMULA (2-LANGKAH PENGESAHAN 4 SAAT)
+     *************************************************************************/
+    function kendaliMulaSemula() {
+      const btn = document.getElementById("btn-reset-all");
+      if (!resetPending) {
+        resetPending = true;
+        btn.classList.add("confirm-state");
+        btn.textContent = "Tekan lagi untuk padam semua";
+        resetConfirmTimer = setTimeout(() => {
+          resetPending = false;
+          btn.classList.remove("confirm-state");
+          btn.textContent = "🔄 Mula semula";
+        }, 4000);
+      } else {
+        clearTimeout(resetConfirmTimer);
+        localStorage.removeItem(STORAGE_KEY);
+        if (window.AIAdaptif && typeof AIAdaptif.setSemula === "function") {
+          AIAdaptif.setSemula();
+        }
+        location.reload();
+      }
+    }
+
+    /*************************************************************************
+     * 11. INISIALISASI APLIKASI
+     *************************************************************************/
+    window.addEventListener("DOMContentLoaded", () => {
+      muatState();
+      kemasKiniHeader();
+      sediakanArKad();
+      binaPaparanRenung();
+      muatKuizAdaptif();
+      janaCabaranCuba();
+      
+      // Aktifkan pemasa peringatan jika murid berhenti
+      ["click", "keydown", "touchstart"].forEach(evt => {
+        document.addEventListener(evt, resetPemasaPeringatan, { passive: true });
+      });
+
+      tukarFasa(state.fasaSemasa || 1);
+    });
+  </script>
+</body>
+</html>
